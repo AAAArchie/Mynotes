@@ -1,6 +1,6 @@
-def search(array,target):
+def search(array, target):
     left = 0
-    right = len(array)-1
+    right = len(array) - 1
     while left <= right:
         mid = (left + right) // 2
         if target == array[mid]:
@@ -12,5 +12,4 @@ def search(array,target):
     return -1
 
 
-print(search([1,2,3,4,5,6,7],4))
-
+print(search([1, 2, 3, 4, 5, 6, 7], 4))
