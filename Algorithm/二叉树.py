@@ -5,13 +5,13 @@ class BST:
         self.right = None
 
 
-def inOrderArray(tree, array=[]):
+def in_order_array(tree, array=[]):
     if tree is None:
         return []
     else:
-        inOrderArray(tree.left, array)
+        in_order_array(tree.left, array)
         array.append(tree.value)
-        inOrderArray(tree.right, array)
+        in_order_array(tree.right, array)
     return array
 
 
@@ -24,4 +24,4 @@ a.left.left = BST(2)
 a.right = BST(3)
 a.right.right = BST(4)
 
-print(inOrderArray(a))
+print(in_order_array(a))
