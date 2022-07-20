@@ -1,7 +1,7 @@
 import json
 from rest_framework import mixins, viewsets, status, generics
 from django.http import HttpResponse, Http404
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, action
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -40,7 +40,7 @@ def FBV_post(request):
 @api_view(['GET', 'POST'])
 def FBV_api_view(request):
     """
-    列出所有的ImagesPost，或者创建一个新的ImagesPost。
+    列出所有的TestPost，或者创建一个新的TestPost。
     """
     if request.method == 'GET':
         test_post = TestPost.objects.all()
@@ -58,7 +58,7 @@ def FBV_api_view(request):
 # CBV 类视图  DRF框架的视图的基类是 APIView
 class CBVAPIViewList(APIView):
     """
-    列出所有的snippets或者创建一个新的snippet。
+    列出所有的TestPost或者创建一个新的TestPost。
     """
 
     def get(self, request):
@@ -76,7 +76,7 @@ class CBVAPIViewList(APIView):
 
 class CBVAPIViewDetail(APIView):
     """
-    检索，更新或删除一个snippet示例。
+    检索，更新或删除一个TestPost示例。
     """
 
     def get_object(self, pk):
@@ -170,18 +170,79 @@ class RetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
 
 # 视图集
 class TestPostViewSet(ViewSet):
-    # 没有这个属性要加上  # router.register(r'TestPostViewSet', views.TestPostViewSet, basename="post_post")
-    # queryset = TestPost.objects.all()
-    # serializer = TestPostLogSerializer(queryset, many=True)
+    """
+    没有这个属性要加上  # router.register(r'TestPostViewSet', views.TestPostViewSet, basename="post_post")
+    queryset = TestPost.objects.all()
+    serializer = TestPostLogSerializer(queryset, many=True)
+    """
 
-    # get
+    """    
+    getlist() 提供一组数据
+    retrieve() 提供单个数据
+    create() 创建数据
+    update() 保存数据
+    destory() 删除数据
+    
+    使用ViewSet通常并不方便，因为list、retrieve、create、update、destory等方法都需要自己编写，
+    而这些方法与前面讲过的Mixin扩展类提供的方法同名，所以我们可以通过继承Mixin扩展类来复用这些方法而无需自己编写。
+    但是Mixin扩展类依赖与GenericAPIView，所以还需要继承GenericAPIView。
+
+    """
+
     def list(self, request):
         queryset = TestPost.objects.all()
         serializer = TestPostLogSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    # get
     def retrieve(self, request, pk=None):
         queryset = TestPost.objects.all()
         serializer = TestPostLogSerializer(queryset)
         return Response(serializer.data)
+
+
+class TestPostViewSetV1(mixins.CreateModelMixin,
+                        mixins.ListModelMixin,
+                        mixins.RetrieveModelMixin,
+                        viewsets.GenericViewSet):
+    """
+    自定义视图类 GenericViewSet
+    GenericViewSet帮助我们完成了继承工作，继承自GenericAPIView与ViewSetMixin，
+    在实现了调用as_view()时传入字典（如{‘get’:‘list’}）的映射处理工作的同时，
+    还提供了GenericAPIView提供的基础方法，可以直接搭配Mixin扩展类使用。
+    """
+
+    queryset = TestPost.objects.all()
+    serializer_class = TestPostLogSerializer
+
+    def get_queryset(self):
+        return TestPost.objects.all()
+
+
+class TestPostViewSetV2(viewsets.ModelViewSet):
+    """
+    ModelViewSet继承自GenericViewSet，
+    同时包括了ListModelMixin、RetrieveModelMixin、
+    CreateModelMixin、UpdateModelMixin、DestoryModelMixin。
+    """
+    queryset = TestPost.objects.all()
+    serializer_class = TestPostLogSerializer
+
+    def get_queryset(self):
+        return TestPost.objects.all()
+
+    """
+    action装饰器默认路由请求GET，但也可以通过设置methods参数接受其他 HTTP 方法。例如：
+    @action(detail=True, methods=['post', 'delete'])
+    """
+
+    @action(detail=True, methods=['get'], url_path="action_test_url")
+    def action_test(self, request, pk=None):
+        queryset = self.get_object()  # 查询实例
+        serializer = TestPostLogSerializer(data=request.data)
+        if serializer.is_valid():
+            queryset.save()
+            return Response(queryset)
+        else:
+            return Response(serializer.errors,
+                            status=status.HTTP_400_BAD_REQUEST)
+
