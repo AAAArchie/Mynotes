@@ -23,7 +23,10 @@ router = DefaultRouter()
 
 # class RedirectToAPI(RedirectView):
 #     url = '/api/'
+# 视图集 url
 router.register(r'TestPostViewSet', views.TestPostViewSet, basename="post_post")
+router.register(r'TestPostViewSetV1', views.TestPostViewSetV1, basename="post_post_v1")
+router.register(r'TestPostViewSetV2', views.TestPostViewSetV2, basename="post_post_v2")
 
 urlpatterns = [
     path('admin/', admin.site.urls),
