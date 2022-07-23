@@ -1,8 +1,10 @@
 import json
 from rest_framework import mixins, viewsets, status, generics
 from django.http import HttpResponse, Http404
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.decorators import api_view, action
 from rest_framework.generics import GenericAPIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
@@ -173,6 +175,10 @@ class TestPostViewSetV1(mixins.CreateModelMixin,
         return TestPost.objects.all()
 
 
+class ReadOnly:
+    pass
+
+
 class TestPostViewSetV2(viewsets.ModelViewSet):
     """
     ModelViewSet继承自GenericViewSet，
@@ -181,6 +187,12 @@ class TestPostViewSetV2(viewsets.ModelViewSet):
     """
     queryset = TestPost.objects.all()
     serializer_class = TestPostLogSerializer
+
+    authentication_classes = [SessionAuthentication, BasicAuthentication]  # 局部认证
+
+    permission_classes = [IsAuthenticated | ReadOnly]  # 局部权限
+
+    throttle_scope = 'downloads'  # 局部自定义限流
 
     def get_queryset(self):
         return TestPost.objects.all()
