@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from post.models import TestPost
+from post_app.models import TestPost, CdsNasClusterInfo
 
 
 class TestPostLogSerializer(serializers.ModelSerializer):
@@ -10,3 +10,13 @@ class TestPostLogSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestPost
         fields = ["upload_images", 'text_1', "text_2"]
+
+
+class CdsNasClusterInfoSerializer(serializers.ModelSerializer):
+    """
+    NasClusterInfo序列化
+    """
+
+    class Meta:
+        model = CdsNasClusterInfo
+        fields = '__all__'
