@@ -178,7 +178,7 @@ class TestPostViewSetV1(mixins.CreateModelMixin,
 
 class StandardResultsSetPagination(PageNumberPagination):
     """自定义分页类"""
-    page_size = 1  # 默认大小
+    page_size = 2  # 默认大小
     page_size_query_param = 'page_size'  # 前端可以展示的页面大小
     max_page_size = 5  # 页面最大大小
 
@@ -204,6 +204,13 @@ class TestPostViewSetV2(viewsets.ModelViewSet):
     """
         http://api.example.org/accounts/?limit=100
         http://api.example.org/accounts/?offset=400&limit=100
+    """
+
+    # 精确过滤,不支持模糊查询
+    # filter_backends = [DjangoFilterBackend]  # 已经在全局配置
+    filterset_fields = ['text_1', 'text_2']  # 元素为models中定义的需要过滤的字段
+    """
+        http://127.0.0.1:8000/api/TestPostViewSetV2/?text_1=12
     """
 
     def get_queryset(self):

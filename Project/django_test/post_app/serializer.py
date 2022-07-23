@@ -3,13 +3,13 @@ from post_app.models import TestPost, CdsNasClusterInfo
 
 
 class TestPostLogSerializer(serializers.ModelSerializer):
-    # upload_images = serializers.ImageField()
-    # text_1 = serializers.CharField(read_only=True)
-    # text_2 = serializers.CharField(read_only=True)
+    upload_images = serializers.ImageField()
+    text_1 = serializers.CharField(read_only=True)
+    text_2 = serializers.CharField(read_only=True)
 
     class Meta:
         model = TestPost
-        fields = '__all__'
+        fields = ["upload_images", 'text_1', "text_2"]
 
 
 class CdsNasClusterInfoSerializer(serializers.ModelSerializer):
