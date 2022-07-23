@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from rest_framework.viewsets import ViewSet
 from post_app.models import TestPost
 from post_app.serializer import TestPostLogSerializer
+from rest_framework.pagination import LimitOffsetPagination, PageNumberPagination
 
 
 # CBV 类视图  DRF框架的视图的基类是 APIView
@@ -175,8 +176,11 @@ class TestPostViewSetV1(mixins.CreateModelMixin,
         return TestPost.objects.all()
 
 
-class ReadOnly:
-    pass
+class StandardResultsSetPagination(PageNumberPagination):
+    """自定义分页类"""
+    page_size = 1  # 默认大小
+    page_size_query_param = 'page_size'  # 前端可以展示的页面大小
+    max_page_size = 5  # 页面最大大小
 
 
 class TestPostViewSetV2(viewsets.ModelViewSet):
@@ -190,9 +194,17 @@ class TestPostViewSetV2(viewsets.ModelViewSet):
 
     authentication_classes = [SessionAuthentication, BasicAuthentication]  # 局部认证
 
-    permission_classes = [IsAuthenticated | ReadOnly]  # 局部权限
+    # permission_classes = [IsAuthenticated | ReadOnly]  # 局部权限
 
     throttle_scope = 'downloads'  # 局部自定义限流
+
+    # pagination_class = LimitOffsetPagination  # 局部分页
+    # pagination_class = PageNumberPagination  # 局部分页，可查指定页码
+    pagination_class = StandardResultsSetPagination  # 自定义分页对象
+    """
+        http://api.example.org/accounts/?limit=100
+        http://api.example.org/accounts/?offset=400&limit=100
+    """
 
     def get_queryset(self):
         return TestPost.objects.all()
@@ -206,4 +218,6 @@ class TestPostViewSetV2(viewsets.ModelViewSet):
 
     @action(detail=False, methods=['get'], url_path="action_test")
     def action_test(self, request, *args, **kwargs):
-        return Response("successful")
+        queryset = TestPost.objects.all()
+        serializer = TestPostLogSerializer(queryset)
+        return Response(serializer.data)

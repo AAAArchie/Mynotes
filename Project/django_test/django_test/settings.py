@@ -164,4 +164,8 @@ REST_FRAMEWORK = {
     #     'downloads': '1000/day',
     #     'uploads': '20/day'
     # }
+
+    # 分页
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 2  # 每页两条数据
 }
