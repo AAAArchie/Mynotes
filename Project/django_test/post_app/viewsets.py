@@ -190,13 +190,8 @@ class TestPostViewSetV2(viewsets.ModelViewSet):
     @action(detail=True, methods=['post_app', 'delete'])
     """
 
-    @action(detail=True, methods=['get'], url_path="action_test_url")
-    def action_test(self, request, pk=None):
-        queryset = self.get_object()  # 查询实例
-        serializer = TestPostLogSerializer(data=request.data)
-        if serializer.is_valid():
-            queryset.save()
-            return Response(queryset)
-        else:
-            return Response(serializer.errors,
-                            status=status.HTTP_400_BAD_REQUEST)
+    # http://127.0.0.1:8000/api/TestPostViewSetV2/action_test/
+
+    @action(detail=False, methods=['get'], url_path="action_test")
+    def action_test(self, request, *args, **kwargs):
+        return Response("successful")
